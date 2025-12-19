@@ -1,0 +1,30 @@
+name: Verify Merkle Proofs
+
+on:
+  push:
+    paths:
+      - 'commits/public_commit.json'
+      - 'proofs/**.proof.json'
+      - 'src/verify_proof.py'
+      - '.github/workflows/verify.yml'
+  pull_request:
+    paths:
+      - 'commits/public_commit.json'
+      - 'proofs/**.proof.json'
+      - 'src/verify_proof.py'
+      - '.github/workflows/verify.yml'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Verify all proofs
+        run: |
+          for f in proofs/*.proof.json; do
+            python3 src/verify_proof.py "$f" || exit 1
+          done
